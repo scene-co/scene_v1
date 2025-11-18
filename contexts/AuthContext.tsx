@@ -10,8 +10,8 @@ interface AuthContextType {
   profile: UserProfile | null;
   session: Session | null;
   isLoading: boolean;
+  isLoadingProfile: boolean;
   isAuthenticated: boolean;
-  isEmailVerified: boolean;
   hasProfile: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
@@ -19,8 +19,6 @@ interface AuthContextType {
   createProfile: (profileData: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   refreshProfile: () => Promise<void>;
   checkUsernameAvailability: (username: string) => Promise<boolean>;
-  resendVerificationEmail: () => Promise<void>;
-  checkEmailVerification: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
   useEffect(() => {
     // Initialize auth state
@@ -74,7 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loadProfile = async (userId: string) => {
+    setIsLoadingProfile(true);
     try {
+      console.log('[AuthContext] Loading profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -84,19 +85,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         if (error.code === 'PGRST116') {
           // Profile doesn't exist yet
-          console.log('Profile not found for user');
+          console.log('[AuthContext] Profile not found for user (PGRST116)');
           setProfile(null);
           await AsyncStorage.removeItem(PROFILE_COMPLETED_KEY);
           return;
         }
+        console.error('[AuthContext] Database error loading profile:', error);
         throw error;
       }
 
+      console.log('[AuthContext] Profile loaded successfully:', data);
       setProfile(data);
       await AsyncStorage.setItem(PROFILE_COMPLETED_KEY, 'true');
-    } catch (error) {
-      console.error('Error loading profile:', error);
+    } catch (error: any) {
+      console.error('[AuthContext] Error loading profile:', error);
+      console.error('[AuthContext] Error code:', error?.code);
+      console.error('[AuthContext] Error message:', error?.message);
       setProfile(null);
+    } finally {
+      setIsLoadingProfile(false);
     }
   };
 
@@ -123,9 +130,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: 'scene://',
-        },
       });
 
       if (error) throw error;
@@ -192,56 +196,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const resendVerificationEmail = async () => {
-    try {
-      if (!user?.email) throw new Error('No user email found');
-
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: user.email,
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      console.error('Resend verification error:', error);
-      throw new Error(error.message || 'Failed to resend verification email');
-    }
-  };
-
-  const checkEmailVerification = async (): Promise<boolean> => {
-    try {
-      // First try to refresh the session to get latest user data
-      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-
-      if (!refreshError && refreshedSession?.user) {
-        // Session refresh successful
-        setUser(refreshedSession.user);
-        setSession(refreshedSession);
-        return !!refreshedSession.user.email_confirmed_at;
-      }
-
-      // If refresh fails, fall back to getting current session
-      // This handles the case where session is pending verification
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-
-      if (currentSession?.user) {
-        // Check if user data has been updated
-        const { data: { user: latestUser }, error: userError } = await supabase.auth.getUser();
-
-        if (!userError && latestUser) {
-          setUser(latestUser);
-          setSession(currentSession);
-          return !!latestUser.email_confirmed_at;
-        }
-      }
-
-      return false;
-    } catch (error) {
-      console.error('Check email verification error:', error);
-      return false;
-    }
-  };
-
   const logout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -264,8 +218,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     session,
     isLoading,
+    isLoadingProfile,
     isAuthenticated: !!user,
-    isEmailVerified: !!user?.email_confirmed_at,
     hasProfile: !!profile,
     login,
     signup,
@@ -273,8 +227,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     createProfile,
     refreshProfile,
     checkUsernameAvailability,
-    resendVerificationEmail,
-    checkEmailVerification,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

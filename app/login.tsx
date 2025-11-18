@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,24 @@ import { Button } from '../components/Button';
 
 export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, hasProfile, isLoadingProfile } = useAuth();
+
+  // Redirect authenticated users (only after profile has finished loading)
+  useEffect(() => {
+    // Don't redirect while profile is still loading
+    if (isLoadingProfile) {
+      console.log('[Login] Profile is loading, waiting...');
+      return;
+    }
+
+    if (isAuthenticated && hasProfile) {
+      console.log('[Login] User authenticated with profile, redirecting to home');
+      router.replace('/home' as any);
+    } else if (isAuthenticated && !hasProfile) {
+      console.log('[Login] User authenticated without profile, redirecting to profile-setup');
+      router.replace('/profile-setup' as any);
+    }
+  }, [isAuthenticated, hasProfile, isLoadingProfile]);
 
   const {
     control,
@@ -36,7 +53,8 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await login(data.email.trim(), data.password);
-      // Navigation is handled by AuthContext/index.tsx based on profile status
+      // Navigation will be handled automatically by app/index.tsx
+      console.log('[Login] Login successful');
     } catch (error: any) {
       Alert.alert('Login Failed', error.message || 'An error occurred during login');
     } finally {

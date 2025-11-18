@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,9 +19,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { INDIAN_STATES, GENDER_OPTIONS } from '../constants/indianStates';
 
 export default function ProfileSetupScreen() {
-  const { createProfile, checkUsernameAvailability } = useAuth();
+  const { createProfile, checkUsernameAvailability, hasProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+
+  // Redirect if profile is already created
+  useEffect(() => {
+    if (hasProfile) {
+      console.log('[ProfileSetup] Profile exists, redirecting to home');
+      router.replace('/home' as any);
+    }
+  }, [hasProfile]);
 
   const {
     control,
@@ -85,8 +93,8 @@ export default function ProfileSetupScreen() {
         city: data.city,
       });
 
-      // Navigate to home after successful profile creation
-      router.replace('/home' as any);
+      // Navigation will be handled automatically by app/index.tsx
+      console.log('[ProfileSetup] Profile created successfully');
     } catch (error: any) {
       Alert.alert(
         'Profile Setup Failed',

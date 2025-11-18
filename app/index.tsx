@@ -4,28 +4,34 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 
 export default function Index() {
-  const { isAuthenticated, isEmailVerified, hasProfile, isLoading } = useAuth();
+  const { isAuthenticated, hasProfile, isLoading } = useAuth();
 
   useEffect(() => {
+    console.log('[Index] Auth state:', {
+      isLoading,
+      isAuthenticated,
+      hasProfile,
+    });
+
     if (!isLoading) {
       if (isAuthenticated) {
         // User is logged in
-        if (!isEmailVerified) {
-          // User needs to verify email first
-          router.replace('/verify-email' as any);
-        } else if (hasProfile) {
+        if (hasProfile) {
           // User has completed profile setup
+          console.log('[Index] Routing to /home');
           router.replace('/home' as any);
         } else {
           // User needs to complete profile setup
+          console.log('[Index] Routing to /profile-setup');
           router.replace('/profile-setup' as any);
         }
       } else {
         // User is not logged in, show welcome screen
+        console.log('[Index] Routing to /welcome');
         router.replace('/welcome' as any);
       }
     }
-  }, [isAuthenticated, isEmailVerified, hasProfile, isLoading]);
+  }, [isAuthenticated, hasProfile, isLoading]);
 
   return (
     <View style={styles.container}>

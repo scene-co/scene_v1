@@ -38,8 +38,8 @@ export default function RegisterScreen() {
       setIsLoading(true);
       await signup(data.email, data.password);
 
-      // Navigate to email verification screen after successful registration
-      router.replace('/verify-email' as any);
+      // User is now authenticated, navigate to profile setup
+      router.replace('/profile-setup' as any);
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message || 'Please try again');
     } finally {
