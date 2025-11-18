@@ -1,20 +1,31 @@
-import { useEffect } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
-import { router } from "expo-router";
+import { useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
+import { router } from 'expo-router';
 
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isEmailVerified, hasProfile, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        router.replace("/home" as any);
+        // User is logged in
+        if (!isEmailVerified) {
+          // User needs to verify email first
+          router.replace('/verify-email' as any);
+        } else if (hasProfile) {
+          // User has completed profile setup
+          router.replace('/home' as any);
+        } else {
+          // User needs to complete profile setup
+          router.replace('/profile-setup' as any);
+        }
       } else {
-        router.replace("/login" as any);
+        // User is not logged in, show welcome screen
+        router.replace('/welcome' as any);
       }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isEmailVerified, hasProfile, isLoading]);
 
   return (
     <View style={styles.container}>
@@ -26,8 +37,8 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
 });
