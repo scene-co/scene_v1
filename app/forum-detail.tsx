@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { VoteButton } from '../components/VoteButton';
 import { mockForumPosts } from '../data/mockForums';
 
 export const unstable_settings = {
@@ -22,6 +23,22 @@ export default function ForumDetailScreen() {
     );
   }
 
+  const handleUpvote = () => {
+    Alert.alert('Upvote', 'Upvote functionality will be connected to backend');
+  };
+
+  const handleDownvote = () => {
+    Alert.alert('Downvote', 'Downvote functionality will be connected to backend');
+  };
+
+  const handleShare = () => {
+    Alert.alert('Share', 'Share functionality coming soon');
+  };
+
+  const handleSave = () => {
+    Alert.alert('Save', 'Save functionality coming soon');
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
@@ -38,8 +55,17 @@ export default function ForumDetailScreen() {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.postHeader}>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{post.category}</Text>
+          <View style={styles.headerLeft}>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>c/{post.category}</Text>
+            </View>
+            {post.flair && (
+              <View style={[styles.flairBadge, { backgroundColor: post.flair.color + '20' }]}>
+                <Text style={[styles.flairText, { color: post.flair.color }]}>
+                  {post.flair.text}
+                </Text>
+              </View>
+            )}
           </View>
           <Text style={styles.timestamp}>{post.timestamp}</Text>
         </View>
@@ -49,23 +75,42 @@ export default function ForumDetailScreen() {
         <View style={styles.authorRow}>
           <Ionicons name="person-circle" size={32} color="#666" />
           <View style={styles.authorInfo}>
-            <Text style={styles.authorName}>{post.author}</Text>
+            <Text style={styles.authorName}>u/{post.author}</Text>
             <Text style={styles.authorSubtext}>Active member</Text>
           </View>
         </View>
 
         <View style={styles.postContent}>
-          <Text style={styles.postText}>{post.preview}</Text>
-          <Text style={styles.postText}>
-            This is additional content for the full forum post. In a real application,
-            you would fetch the complete post content from your backend API.
-          </Text>
+          <Text style={styles.postText}>{post.content}</Text>
+        </View>
+
+        <View style={styles.actionsRow}>
+          <View style={styles.voteSection}>
+            <VoteButton
+              score={post.score}
+              userVote={post.userVote}
+              onUpvote={handleUpvote}
+              onDownvote={handleDownvote}
+            />
+          </View>
+
+          <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+              <Ionicons name="share-outline" size={20} color="#999" />
+              <Text style={styles.actionText}>Share</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
+              <Ionicons name="bookmark-outline" size={20} color="#999" />
+              <Text style={styles.actionText}>Save</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.statsRow}>
           <View style={styles.stat}>
             <Ionicons name="chatbubble-outline" size={16} color="#007AFF" />
-            <Text style={styles.statText}>{post.replies} replies</Text>
+            <Text style={styles.statText}>{post.commentCount} comments</Text>
           </View>
           <View style={styles.stat}>
             <Ionicons name="eye-outline" size={16} color="#666" />
@@ -137,6 +182,11 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 8,
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   categoryBadge: {
     backgroundColor: '#E6F4FE',
     paddingHorizontal: 12,
@@ -147,6 +197,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#007AFF',
     fontWeight: '600',
+  },
+  flairBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  flairText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   timestamp: {
     fontSize: 12,
@@ -182,20 +242,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderBottomWidth: 1,
     borderColor: '#F0F0F0',
-    gap: 12,
   },
   postText: {
     fontSize: 15,
     color: '#333',
     lineHeight: 22,
   },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+    gap: 16,
+  },
+  voteSection: {
+    marginRight: 8,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#999',
+  },
   statsRow: {
     flexDirection: 'row',
     gap: 24,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   stat: {
     flexDirection: 'row',

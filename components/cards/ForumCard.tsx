@@ -7,10 +7,27 @@ export interface ForumPost {
   id: string;
   title: string;
   preview: string;
+  content: string;
   author: string;
+  authorId: string;
   replies: number;
+  commentCount: number;
   timestamp: string;
+  createdAt: Date;
   category: string;
+  forumName?: string;
+  forumId?: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  userVote: 'up' | 'down' | null;
+  flair?: {
+    text: string;
+    color: string;
+  };
+  postType: 'text' | 'image' | 'link';
+  thumbnailUrl?: string;
+  isUserJoined: boolean;
 }
 
 interface ForumCardProps {
