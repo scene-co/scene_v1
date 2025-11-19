@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
+import { Allura_400Regular, useFonts } from '@expo-google-fonts/allura';
 import { router } from 'expo-router';
-import { useFonts, Allura_400Regular } from '@expo-google-fonts/allura';
 import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect } from 'react';
+import { Image, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../components/Button';
 
 // Keep the splash screen visible while we load fonts
@@ -29,7 +29,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.content}>
         <Image
-          source={require('../assets/images/splash-logo.png')}
+          source={require('../assets/images/scene_blacklogo_png.png')}
           style={styles.logo}
           resizeMode="contain"
         />

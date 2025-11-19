@@ -3,7 +3,9 @@ import { Session, User } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { UserProfile } from '../types';
+import { UserProfile, ProfileUpdateData } from '../types';
+import { canChangeUsername } from '../utils/dateUtils';
+import { followUser as followUserService, unfollowUser as unfollowUserService, isFollowing as checkIsFollowing } from '../services/followService';
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +21,11 @@ interface AuthContextType {
   createProfile: (profileData: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   refreshProfile: () => Promise<void>;
   checkUsernameAvailability: (username: string) => Promise<boolean>;
+  updateProfile: (profileData: ProfileUpdateData) => Promise<void>;
+  validateUsernameChange: (newUsername: string) => Promise<{ canChange: boolean; reason?: string }>;
+  followUser: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  unfollowUser: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  isFollowing: (userId: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -213,6 +220,110 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProfile = async (profileData: ProfileUpdateData) => {
+    try {
+      if (!user) throw new Error('No authenticated user');
+
+      // If username is being changed, validate cooldown
+      if (profileData.username && profileData.username !== profile?.username) {
+        const validation = await validateUsernameChange(profileData.username);
+        if (!validation.canChange) {
+          throw new Error(validation.reason || 'Cannot change username at this time');
+        }
+
+        // Update username change tracking
+        const currentDate = new Date().toISOString();
+        const isSameDay = profile?.username_last_changed &&
+          new Date(profile.username_last_changed).toDateString() === new Date().toDateString();
+
+        profileData.username_last_changed = currentDate;
+        (profileData as any).username_change_count = isSameDay
+          ? (profile?.username_change_count || 0) + 1
+          : 1;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setProfile(data);
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      throw new Error(error.message || 'Failed to update profile');
+    }
+  };
+
+  const validateUsernameChange = async (
+    newUsername: string
+  ): Promise<{ canChange: boolean; reason?: string }> => {
+    if (!profile) {
+      return { canChange: false, reason: 'No profile found' };
+    }
+
+    // Check if username is actually changing
+    if (newUsername === profile.username) {
+      return { canChange: true };
+    }
+
+    // Check cooldown
+    const cooldownCheck = canChangeUsername(
+      profile.username_last_changed,
+      profile.username_change_count
+    );
+
+    if (!cooldownCheck.canChange) {
+      return cooldownCheck;
+    }
+
+    // Check if username is available
+    const isAvailable = await checkUsernameAvailability(newUsername);
+    if (!isAvailable) {
+      return { canChange: false, reason: 'Username is already taken' };
+    }
+
+    return { canChange: true };
+  };
+
+  const followUser = async (userId: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    const result = await followUserService(user.id, userId);
+
+    // Refresh profile to update following count
+    if (result.success) {
+      await refreshProfile();
+    }
+
+    return result;
+  };
+
+  const unfollowUser = async (userId: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    const result = await unfollowUserService(user.id, userId);
+
+    // Refresh profile to update following count
+    if (result.success) {
+      await refreshProfile();
+    }
+
+    return result;
+  };
+
+  const isFollowing = async (userId: string): Promise<boolean> => {
+    if (!user) return false;
+    return await checkIsFollowing(user.id, userId);
+  };
+
   const value: AuthContextType = {
     user,
     profile,
@@ -227,6 +338,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     createProfile,
     refreshProfile,
     checkUsernameAvailability,
+    updateProfile,
+    validateUsernameChange,
+    followUser,
+    unfollowUser,
+    isFollowing,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
