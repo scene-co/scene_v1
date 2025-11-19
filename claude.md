@@ -37,7 +37,7 @@ Components → PascalCase (UserCard.tsx)
 ---
 
 # Workflow Preferences
-- Create small reusable components in src/components/.
+- Create small reusable components in components/.
 - Screens should contain minimal logic; use hooks for data & logic.
 - Before starting a feature:
   1. Define types
@@ -54,10 +54,12 @@ Components → PascalCase (UserCard.tsx)
 
 # Common Commands
 - Start dev server: `npx expo start`
+  - Press `i` for iOS simulator
+  - Press `a` for Android emulator
+  - Scan QR code with Expo Go app on physical device
+- Build for iOS (development): `npx expo run:ios`
+- Build for Android (development): `npx expo run:android`
 - Build (web): `npm run build`
-- Capacitor sync: `npx cap sync`
-- Open iOS: `npx cap open ios`
-- Open Android: `npx cap open android`
 - Test: `npm test`
 - Lint: `npm run lint`
 

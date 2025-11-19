@@ -2,6 +2,15 @@ import { z } from 'zod';
 import { INDIAN_STATES, GENDER_OPTIONS } from '../constants/indianStates';
 
 export const profileSetupSchema = z.object({
+  first_name: z
+    .string()
+    .min(1, 'First name is required')
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must not exceed 50 characters')
+    .regex(
+      /^[a-zA-Z\s]+$/,
+      'First name can only contain letters and spaces'
+    ),
   username: z
     .string()
     .min(1, 'Username is required')

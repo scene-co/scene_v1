@@ -3,6 +3,7 @@ import { Gender, IndianState } from '../constants/indianStates';
 
 export interface UserProfile {
   id: string;
+  first_name: string;
   username: string;
   age: number;
   gender: Gender;
@@ -31,6 +32,7 @@ export interface RegisterData {
 }
 
 export interface ProfileSetupData {
+  first_name: string;
   username: string;
   age: number;
   gender: Gender;

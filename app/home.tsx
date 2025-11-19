@@ -1,61 +1,80 @@
-import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import { useFonts, Allura_400Regular } from '@expo-google-fonts/allura';
+import { TopBar } from '../components/TopBar';
+import { SearchBar } from '../components/SearchBar';
+import { BottomTabBar } from '../components/BottomTabBar';
+import { SectionHeader } from '../components/SectionHeader';
+import { HorizontalCarousel } from '../components/HorizontalCarousel';
+import { EventCard } from '../components/cards/EventCard';
+import { MarketplaceCard } from '../components/cards/MarketplaceCard';
+import { ForumCard } from '../components/cards/ForumCard';
+import { mockEvents } from '../data/mockEvents';
+import { mockMarketplaceItems } from '../data/mockMarketplace';
+import { mockForumPosts } from '../data/mockForums';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const { user, profile, logout } = useAuth();
+  const { profile } = useAuth();
+  const [greeting, setGreeting] = useState('');
 
-  const [fontsLoaded] = useFonts({
-    Allura_400Regular,
-  });
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      setGreeting('Good morning');
+    } else if (hour >= 12 && hour < 17) {
+      setGreeting('Good afternoon');
+    } else if (hour >= 17 && hour < 22) {
+      setGreeting('Good evening');
+    } else {
+      setGreeting('Good night');
     }
-  };
+  }, []);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  const handleMenuPress = () => {
+    Alert.alert('Menu', 'Sidebar menu coming soon!');
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.welcomeText}>Welcome,</Text>
-        <Text style={styles.tagline}>let's explore what's the scene</Text>
+      <TopBar onMenuPress={handleMenuPress} />
 
-        {profile && (
-          <View style={styles.profileInfo}>
-            <Text style={styles.username}>@{profile.username}</Text>
-            <Text style={styles.details}>
-              {profile.age} • {profile.gender}
-            </Text>
-            {profile.college_name && (
-              <Text style={styles.details}>{profile.college_name}</Text>
-            )}
-            <Text style={styles.details}>
-              {profile.city}, {profile.state}
-            </Text>
-          </View>
-        )}
-
-        {user && (
-          <Text style={styles.email}>{user.email}</Text>
-        )}
-
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>
-            Main navigation and features coming soon...
-          </Text>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.greetingSection}>
+          <Text style={styles.greetingText}>{greeting},</Text>
+          <Text style={styles.nameText}>{profile?.first_name || 'User'}</Text>
         </View>
-      </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
+        <SearchBar />
+
+        <View style={styles.section}>
+          <SectionHeader title="Events" seeAllPath="/events" />
+          <HorizontalCarousel>
+            {mockEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </HorizontalCarousel>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Marketplace" seeAllPath="/marketplace" />
+          <HorizontalCarousel>
+            {mockMarketplaceItems.map((item) => (
+              <MarketplaceCard key={item.id} item={item} />
+            ))}
+          </HorizontalCarousel>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Forums" seeAllPath="/forums" />
+          <HorizontalCarousel>
+            {mockForumPosts.map((post) => (
+              <ForumCard key={post.id} post={post} />
+            ))}
+          </HorizontalCarousel>
+        </View>
+      </ScrollView>
+
+      <BottomTabBar />
     </View>
   );
 }
@@ -63,74 +82,33 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 24,
-    paddingTop: 60,
+    backgroundColor: '#FFF',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingBottom: 40,
   },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  greetingSection: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 20,
   },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  tagline: {
-    fontFamily: 'Allura_400Regular',
+  greetingText: {
     fontSize: 32,
-    color: '#007AFF',
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  profileInfo: {
-    alignItems: 'center',
-    marginBottom: 24,
-    padding: 20,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 16,
-    width: '100%',
-  },
-  username: {
-    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 8,
+    lineHeight: 38,
   },
-  details: {
-    fontSize: 16,
+  nameText: {
+    fontSize: 24,
+    fontWeight: '500',
     color: '#666',
-    marginTop: 4,
+    lineHeight: 32,
+    marginTop: 2,
   },
-  email: {
-    fontSize: 14,
-    color: '#999',
-    marginBottom: 16,
-  },
-  placeholder: {
-    marginTop: 32,
-    padding: 20,
-    backgroundColor: '#E6F4FE',
-    borderRadius: 12,
-    width: '100%',
-  },
-  placeholderText: {
-    fontSize: 14,
-    color: '#007AFF',
-    textAlign: 'center',
-  },
-  logoutButton: {
-    backgroundColor: '#FF3B30',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  section: {
+    marginBottom: 24,
   },
 });

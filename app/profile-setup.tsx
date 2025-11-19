@@ -40,6 +40,7 @@ export default function ProfileSetupScreen() {
   } = useForm<ProfileSetupFormData>({
     resolver: zodResolver(profileSetupSchema),
     defaultValues: {
+      first_name: '',
       username: '',
       age: undefined,
       gender: undefined,
@@ -85,6 +86,7 @@ export default function ProfileSetupScreen() {
       }
 
       await createProfile({
+        first_name: data.first_name,
         username: data.username,
         age: data.age,
         gender: data.gender,
@@ -122,6 +124,15 @@ export default function ProfileSetupScreen() {
         </View>
 
         <View style={styles.form}>
+          <FormInput
+            name="first_name"
+            control={control}
+            label="First Name"
+            placeholder="Enter your first name"
+            error={errors.first_name}
+            autoCapitalize="words"
+          />
+
           <FormInput
             name="username"
             control={control}
