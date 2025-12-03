@@ -61,8 +61,8 @@ export function MarketplaceCard({ item }: MarketplaceCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 280,
-    backgroundColor: '#FFF',
+    width: '100%',
+    backgroundColor: '#D3E1C4',
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#00311F',
     marginBottom: 8,
     lineHeight: 20,
   },
@@ -102,17 +102,17 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#007AFF',
+    color: '#00311F',
   },
   conditionBadge: {
-    backgroundColor: '#E6F4FE',
+    backgroundColor: '#E8E8E8',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
   },
   conditionText: {
     fontSize: 11,
-    color: '#007AFF',
+    color: '#00311F',
     fontWeight: '600',
   },
   footer: {

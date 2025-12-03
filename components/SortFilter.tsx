@@ -36,7 +36,7 @@ export function SortFilter({ activeSort, onSortChange }: SortFilterProps) {
               <Ionicons
                 name={sort.icon}
                 size={16}
-                color={isActive ? '#007AFF' : '#999'}
+                color={isActive ? '#000' : '#999'}
               />
               <Text style={[styles.sortText, isActive && styles.sortTextActive]}>
                 {sort.label}
@@ -51,7 +51,7 @@ export function SortFilter({ activeSort, onSortChange }: SortFilterProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   sortButtonActive: {
-    backgroundColor: '#E6F4FE',
+    backgroundColor: '#E8E8E8',
   },
   sortText: {
     fontSize: 14,
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   sortTextActive: {
-    color: '#007AFF',
+    color: '#000',
   },
 });

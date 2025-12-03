@@ -67,7 +67,7 @@ export function ForumCard({ post }: ForumCardProps) {
         </View>
 
         <View style={styles.replies}>
-          <Ionicons name="chatbubble-outline" size={14} color="#007AFF" />
+          <Ionicons name="chatbubble-outline" size={14} color="#000" />
           <Text style={styles.repliesText}>{post.replies} replies</Text>
         </View>
       </View>
@@ -78,7 +78,7 @@ export function ForumCard({ post }: ForumCardProps) {
 const styles = StyleSheet.create({
   card: {
     width: 280,
-    backgroundColor: '#FFF',
+    backgroundColor: '#DFB6B2',
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -95,14 +95,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryBadge: {
-    backgroundColor: '#E6F4FE',
+    backgroundColor: '#E8E8E8',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   categoryText: {
     fontSize: 11,
-    color: '#007AFF',
+    color: '#000',
     fontWeight: '600',
   },
   timestamp: {
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   repliesText: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#000',
     fontWeight: '500',
   },
 });

@@ -142,7 +142,7 @@ export default function ProfileEditScreen() {
 
     return (
       <LinearGradient
-        colors={['#5865F2', '#7983F5', '#9C9EF8']}
+        colors={['#D3E1C4', '#A8C5A1', '#7FA87E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.bannerImage}
@@ -160,7 +160,7 @@ export default function ProfileEditScreen() {
         <Text style={styles.headerTitle}>Edit Profile</Text>
         <TouchableOpacity onPress={handleSave} disabled={loading}>
           {loading ? (
-            <ActivityIndicator size="small" color="#5865F2" />
+            <ActivityIndicator size="small" color="#00311F" />
           ) : (
             <Text style={styles.saveButton}>Save</Text>
           )}
@@ -245,7 +245,7 @@ export default function ProfileEditScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
   },
   header: {
     flexDirection: 'row',
@@ -254,17 +254,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: 'rgba(0, 49, 31, 0.2)',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#00311F',
   },
   saveButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#5865F2',
+    color: '#00311F',
   },
   content: {
     flex: 1,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: '#FFF',
+    borderColor: '#FFF7E6',
     backgroundColor: '#F5F5F5',
   },
   profilePicPlaceholder: {
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: '#FFF',
+    borderColor: '#FFF7E6',
     backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
@@ -320,11 +320,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#5865F2',
+    backgroundColor: '#D3E1C4',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#FFF',
+    borderColor: '#FFF7E6',
   },
   form: {
     paddingHorizontal: 16,

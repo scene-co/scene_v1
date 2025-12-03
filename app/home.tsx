@@ -50,7 +50,9 @@ export default function Home() {
           <SectionHeader title="Events" seeAllPath="/events" />
           <HorizontalCarousel>
             {mockEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <View key={event.id} style={styles.carouselItem}>
+                <EventCard event={event} />
+              </View>
             ))}
           </HorizontalCarousel>
         </View>
@@ -82,7 +84,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
   },
   scrollView: {
     flex: 1,
@@ -98,17 +100,20 @@ const styles = StyleSheet.create({
   greetingText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#00311F',
     lineHeight: 38,
   },
   nameText: {
     fontSize: 24,
     fontWeight: '500',
-    color: '#666',
+    color: '#00311F',
     lineHeight: 32,
     marginTop: 2,
   },
   section: {
     marginBottom: 24,
+  },
+  carouselItem: {
+    width: 340,
   },
 });

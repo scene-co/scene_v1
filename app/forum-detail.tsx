@@ -109,7 +109,7 @@ export default function ForumDetailScreen() {
 
         <View style={styles.statsRow}>
           <View style={styles.stat}>
-            <Ionicons name="chatbubble-outline" size={16} color="#007AFF" />
+            <Ionicons name="chatbubble-outline" size={16} color="#000" />
             <Text style={styles.statText}>{post.commentCount} comments</Text>
           </View>
           <View style={styles.stat}>
@@ -136,7 +136,7 @@ export default function ForumDetailScreen() {
           placeholderTextColor="#999"
         />
         <TouchableOpacity style={styles.sendButton}>
-          <Ionicons name="send" size={20} color="#007AFF" />
+          <Ionicons name="send" size={20} color="#000" />
         </TouchableOpacity>
       </View>
     </View>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#000',
     fontWeight: '600',
   },
   flairBadge: {

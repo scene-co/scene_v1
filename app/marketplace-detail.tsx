@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
   },
   conditionText: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#000',
     fontWeight: '600',
   },
   price: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#000',
     marginBottom: 24,
   },
   sellerSection: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   contactButton: {
     flexDirection: 'row',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

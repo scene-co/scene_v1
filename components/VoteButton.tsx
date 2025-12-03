@@ -27,7 +27,7 @@ export function VoteButton({ score, userVote, onUpvote, onDownvote }: VoteButton
         <Ionicons
           name={userVote === 'up' ? 'arrow-up' : 'arrow-up-outline'}
           size={20}
-          color={userVote === 'up' ? '#007AFF' : '#999'}
+          color={userVote === 'up' ? '#000' : '#999'}
         />
       </TouchableOpacity>
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   scoreUpvoted: {
-    color: '#007AFF',
+    color: '#000',
   },
   scoreDownvoted: {
     color: '#999',

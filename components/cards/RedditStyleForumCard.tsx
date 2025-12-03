@@ -120,7 +120,7 @@ export function RedditStyleForumCard({ post }: RedditStyleForumCardProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
     paddingVertical: 10,

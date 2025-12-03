@@ -87,7 +87,7 @@ export default function ForumsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
   },
   listContent: {
     paddingBottom: 100,

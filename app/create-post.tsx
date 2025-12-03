@@ -89,7 +89,7 @@ export default function CreatePostScreen() {
               <Ionicons
                 name="document-text"
                 size={20}
-                color={postType === 'text' ? '#007AFF' : '#999'}
+                color={postType === 'text' ? '#000' : '#999'}
               />
               <Text style={[styles.typeText, postType === 'text' && styles.typeTextActive]}>
                 Text
@@ -104,7 +104,7 @@ export default function CreatePostScreen() {
               <Ionicons
                 name="image"
                 size={20}
-                color={postType === 'image' ? '#007AFF' : '#999'}
+                color={postType === 'image' ? '#000' : '#999'}
               />
               <Text style={[styles.typeText, postType === 'image' && styles.typeTextActive]}>
                 Image
@@ -119,7 +119,7 @@ export default function CreatePostScreen() {
               <Ionicons
                 name="link"
                 size={20}
-                color={postType === 'link' ? '#007AFF' : '#999'}
+                color={postType === 'link' ? '#000' : '#999'}
               />
               <Text style={[styles.typeText, postType === 'link' && styles.typeTextActive]}>
                 Link
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   postButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000',
   },
   content: {
     flex: 1,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeButtonActive: {
-    backgroundColor: '#E6F4FE',
+    backgroundColor: '#E8E8E8',
   },
   typeText: {
     fontSize: 14,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   typeTextActive: {
-    color: '#007AFF',
+    color: '#000',
   },
   categoryScroll: {
     gap: 8,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
   },
   categoryText: {
     fontSize: 14,

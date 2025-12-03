@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
   },
   categoryText: {
     fontSize: 14,

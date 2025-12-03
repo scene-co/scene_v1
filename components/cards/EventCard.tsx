@@ -27,15 +27,20 @@ export function EventCard({ event }: EventCardProps) {
     <TouchableOpacity
       style={styles.card}
       onPress={handlePress}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       {event.image ? (
         <Image source={{ uri: event.image }} style={styles.image} />
       ) : (
         <View style={styles.imagePlaceholder}>
-          <Ionicons name="calendar" size={32} color="#007AFF" />
+          <Ionicons name="calendar" size={48} color="#9333EA" />
         </View>
       )}
+
+      {/* Bookmark Icon */}
+      <TouchableOpacity style={styles.bookmarkButton} onPress={(e) => e.stopPropagation()}>
+        <Ionicons name="bookmark-outline" size={24} color="#FFF" />
+      </TouchableOpacity>
 
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
@@ -43,20 +48,11 @@ export function EventCard({ event }: EventCardProps) {
         </Text>
 
         <View style={styles.infoRow}>
-          <Ionicons name="time-outline" size={14} color="#666" />
-          <Text style={styles.infoText}>{event.date} • {event.time}</Text>
+          <Text style={styles.infoText}>{event.date}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Ionicons name="location-outline" size={14} color="#666" />
-          <Text style={styles.infoText} numberOfLines={1}>{event.location}</Text>
-        </View>
-
-        <View style={styles.footer}>
-          <View style={styles.attendees}>
-            <Ionicons name="people-outline" size={14} color="#007AFF" />
-            <Text style={styles.attendeesText}>{event.attendees} attending</Text>
-          </View>
+          <Text style={styles.locationText} numberOfLines={1}>{event.location}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -65,63 +61,64 @@ export function EventCard({ event }: EventCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 280,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
+    width: '100%',
+    aspectRatio: 340 / 450,
+    backgroundColor: '#2D1B3D',
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
+    marginRight: 16,
   },
   image: {
     width: '100%',
-    height: 120,
-    backgroundColor: '#F5F5F5',
+    height: 360,
+    backgroundColor: '#3D2B4D',
   },
   imagePlaceholder: {
     width: '100%',
-    height: 120,
-    backgroundColor: '#E6F4FE',
+    height: 360,
+    backgroundColor: '#3D2B4D',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  bookmarkButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
   content: {
-    padding: 12,
+    padding: 16,
+    flex: 1,
+    justifyContent: 'flex-end',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-    lineHeight: 20,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 6,
+    lineHeight: 22,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-    gap: 4,
+    marginBottom: 2,
   },
   infoText: {
     fontSize: 13,
-    color: '#666',
-    flex: 1,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  attendees: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  attendeesText: {
-    fontSize: 12,
-    color: '#007AFF',
+    color: '#D4D4D8',
     fontWeight: '500',
+  },
+  locationText: {
+    fontSize: 12,
+    color: '#A1A1AA',
   },
 });

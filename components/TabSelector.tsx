@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   tabTextActive: {
-    color: '#007AFF',
+    color: '#000',
   },
   activeIndicator: {
     position: 'absolute',
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
   },
 });

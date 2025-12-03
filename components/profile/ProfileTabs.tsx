@@ -58,7 +58,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               <Ionicons
                 name={tab.icon as any}
                 size={18}
-                color={isActive ? '#5865F2' : '#666'}
+                color={isActive ? '#00311F' : '#666'}
               />
               <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>
                 {tab.label}
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    backgroundColor: '#FFF',
+    borderBottomColor: 'rgba(0, 49, 31, 0.2)',
+    backgroundColor: '#FFF7E6',
   },
   tab: {
     flex: 1,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   activeTabLabel: {
     fontWeight: '600',
-    color: '#5865F2',
+    color: '#00311F',
   },
   activeIndicator: {
     position: 'absolute',
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 3,
-    backgroundColor: '#5865F2',
+    backgroundColor: '#00311F',
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
   },

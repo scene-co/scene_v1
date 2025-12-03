@@ -38,7 +38,7 @@ export default function EventDetailScreen() {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.imagePlaceholder}>
-          <Ionicons name="calendar" size={64} color="#007AFF" />
+          <Ionicons name="calendar" size={64} color="#000" />
         </View>
 
         <View style={styles.details}>
@@ -46,7 +46,7 @@ export default function EventDetailScreen() {
 
           <View style={styles.infoSection}>
             <View style={styles.infoRow}>
-              <Ionicons name="time-outline" size={20} color="#007AFF" />
+              <Ionicons name="time-outline" size={20} color="#000" />
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Date & Time</Text>
                 <Text style={styles.infoValue}>{event.date} at {event.time}</Text>
@@ -54,7 +54,7 @@ export default function EventDetailScreen() {
             </View>
 
             <View style={styles.infoRow}>
-              <Ionicons name="location-outline" size={20} color="#007AFF" />
+              <Ionicons name="location-outline" size={20} color="#000" />
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Location</Text>
                 <Text style={styles.infoValue}>{event.location}</Text>
@@ -62,7 +62,7 @@ export default function EventDetailScreen() {
             </View>
 
             <View style={styles.infoRow}>
-              <Ionicons name="people-outline" size={20} color="#007AFF" />
+              <Ionicons name="people-outline" size={20} color="#000" />
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Attendees</Text>
                 <Text style={styles.infoValue}>{event.attendees} people</Text>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   joinButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

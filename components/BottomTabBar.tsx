@@ -7,6 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 export function BottomTabBar() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const isEventsPage = pathname === '/events';
+  const isHomePage = pathname === '/home';
+  const isForumsPage = pathname === '/forums';
+  const isMarketplacePage = pathname === '/marketplace';
+  const isProfilePage = pathname === '/profile';
 
   const tabs = [
     {
@@ -46,8 +51,18 @@ export function BottomTabBar() {
     router.push(path as any);
   };
 
+  const isDarkPage = isEventsPage || isHomePage || isForumsPage || isMarketplacePage || isProfilePage;
+
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View style={[
+      styles.container,
+      isEventsPage && styles.containerTranslucent,
+      isHomePage && styles.containerHome,
+      isForumsPage && styles.containerForums,
+      isMarketplacePage && styles.containerMarketplace,
+      isProfilePage && styles.containerProfile,
+      { paddingBottom: insets.bottom }
+    ]}>
       {tabs.map((tab) => {
         const isActive = pathname === tab.path;
         return (
@@ -58,23 +73,47 @@ export function BottomTabBar() {
             activeOpacity={0.7}
           >
             {tab.useIonicon ? (
-              <Ionicons
-                name={tab.ionicon}
-                size={24}
-                color={isActive ? '#007AFF' : '#999'}
-                style={styles.iconMargin}
-              />
+              <View style={[
+                isDarkPage && styles.iconWrapperBase,
+                isActive && isEventsPage && styles.iconWrapperActive,
+                isActive && (isHomePage || isForumsPage) && styles.iconWrapperActiveHome,
+                !isDarkPage && styles.iconMargin
+              ]}>
+                <Ionicons
+                  name={tab.ionicon}
+                  size={24}
+                  color={
+                    isEventsPage
+                      ? (isActive ? '#FFC107' : '#D4D4D8')
+                      : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage)
+                      ? (isActive ? '#00311F' : '#666')
+                      : (isActive ? '#000' : '#999')
+                  }
+                />
+              </View>
             ) : (
-              <Image
-                source={tab.icon}
-                style={[
-                  styles.icon,
-                  isActive && styles.iconActive,
-                ]}
-                resizeMode="contain"
-              />
+              <View style={[
+                isDarkPage && styles.iconWrapperBase,
+                isActive && isEventsPage && styles.iconWrapperActive,
+                isActive && (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) && styles.iconWrapperActiveHome
+              ]}>
+                <Image
+                  source={tab.icon}
+                  style={[
+                    styles.icon,
+                    !isDarkPage && styles.iconMargin,
+                    isActive && (isEventsPage ? styles.iconActiveEvents : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) ? styles.iconActiveHome : styles.iconActive),
+                    !isActive && isDarkPage && styles.iconInactiveDark,
+                  ]}
+                  resizeMode="contain"
+                />
+              </View>
             )}
-            <Text style={[styles.label, isActive && styles.labelActive]}>
+            <Text style={[
+              styles.label,
+              isActive && (isEventsPage ? styles.labelActiveEvents : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) ? styles.labelActiveHome : styles.labelActive),
+              !isActive && isDarkPage && styles.labelInactiveDark,
+            ]}>
               {tab.name}
             </Text>
           </TouchableOpacity>
@@ -93,20 +132,66 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingHorizontal: 8,
   },
+  containerTranslucent: {
+    backgroundColor: 'rgba(29, 15, 47, 0.85)',
+    borderTopColor: 'rgba(147, 51, 234, 0.2)',
+  },
+  containerHome: {
+    backgroundColor: '#FFF7E6',
+    borderTopColor: 'rgba(0, 49, 31, 0.2)',
+  },
+  containerForums: {
+    backgroundColor: '#FFF7E6',
+    borderTopColor: 'rgba(0, 49, 31, 0.2)',
+  },
+  containerMarketplace: {
+    backgroundColor: '#FFF7E6',
+    borderTopColor: 'rgba(0, 49, 31, 0.2)',
+  },
+  containerProfile: {
+    backgroundColor: '#FFF7E6',
+    borderTopColor: 'rgba(0, 49, 31, 0.2)',
+  },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
   },
+  iconWrapperBase: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  iconWrapperActive: {
+    backgroundColor: 'rgba(255, 193, 7, 0.15)',
+    borderWidth: 1.5,
+    borderColor: '#FFC107',
+  },
+  iconWrapperActiveHome: {
+    backgroundColor: 'rgba(0, 49, 31, 0.15)',
+    borderWidth: 1.5,
+    borderColor: '#00311F',
+  },
   icon: {
     width: 24,
     height: 24,
-    marginBottom: 4,
     tintColor: '#999',
   },
   iconActive: {
-    tintColor: '#007AFF',
+    tintColor: '#000',
+  },
+  iconActiveEvents: {
+    tintColor: '#FFC107',
+  },
+  iconActiveHome: {
+    tintColor: '#00311F',
+  },
+  iconInactiveDark: {
+    tintColor: '#666',
   },
   iconMargin: {
     marginBottom: 4,
@@ -117,7 +202,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   labelActive: {
-    color: '#007AFF',
+    color: '#000',
     fontWeight: '600',
+  },
+  labelActiveEvents: {
+    color: '#FFC107',
+    fontWeight: '600',
+  },
+  labelActiveHome: {
+    color: '#00311F',
+    fontWeight: '600',
+  },
+  labelInactiveDark: {
+    color: '#666',
+    fontWeight: '500',
   },
 });

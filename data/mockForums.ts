@@ -88,7 +88,7 @@ export const mockForumPosts: ForumPost[] = [
     userVote: null,
     flair: {
       text: 'ADVICE',
-      color: '#007AFF',
+      color: '#000',
     },
     postType: 'text',
     isUserJoined: true,

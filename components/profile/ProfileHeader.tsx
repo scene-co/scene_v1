@@ -50,7 +50,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
     return (
       <LinearGradient
-        colors={['#5865F2', '#7983F5', '#9C9EF8']}
+        colors={['#D3E1C4', '#A8C5A1', '#7FA87E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.banner}
