@@ -43,7 +43,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' ? '#007AFF' : '#FFF'}
+          color={variant === 'outline' ? '#000' : '#FFF'}
         />
       ) : (
         <Text
@@ -71,15 +71,15 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   buttonPrimary: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000',
   },
   buttonSecondary: {
-    backgroundColor: '#5856D6',
+    backgroundColor: '#333',
   },
   buttonOutline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: '#000',
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   buttonTextOutline: {
-    color: '#007AFF',
+    color: '#000',
   },
 });
