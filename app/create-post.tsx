@@ -7,10 +7,15 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
+import { uploadMultipleFiles } from '../services/storageService';
+import { createPost } from '../services/forumService';
 
 export const unstable_settings = {
   animation: 'slide_from_bottom',
@@ -24,6 +29,8 @@ export default function CreatePostScreen() {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<string>('');
   const [postType, setPostType] = useState<PostType>('text');
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const categories = [
     'Food',
@@ -36,7 +43,38 @@ export default function CreatePostScreen() {
     'Events',
   ];
 
-  const handleSubmit = () => {
+  const pickImages = async () => {
+    try {
+      // Request permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to your photos to upload images.');
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        quality: 0.8,
+        selectionLimit: 5, // Max 5 images
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const uris = result.assets.map((asset) => asset.uri);
+        setSelectedImages((prev) => [...prev, ...uris].slice(0, 5)); // Keep max 5 images
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick images');
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'Please enter a title');
       return;
@@ -49,12 +87,52 @@ export default function CreatePostScreen() {
       Alert.alert('Error', 'Please select a category');
       return;
     }
+    if (postType === 'image' && selectedImages.length === 0) {
+      Alert.alert('Error', 'Please select at least one image');
+      return;
+    }
 
-    Alert.alert(
-      'Success',
-      'Post creation will be connected to backend',
-      [{ text: 'OK', onPress: () => router.back() }]
-    );
+    try {
+      setUploading(true);
+
+      let imageUrls: string[] = [];
+
+      // Upload images if post type is image
+      if (postType === 'image' && selectedImages.length > 0) {
+        const result = await uploadMultipleFiles('post-images', selectedImages);
+
+        if (!result.success || !result.urls) {
+          Alert.alert('Upload Error', result.error || 'Failed to upload images');
+          setUploading(false);
+          return;
+        }
+
+        imageUrls = result.urls;
+      }
+
+      // Create the post in Supabase
+      const postResult = await createPost({
+        category,
+        title,
+        content,
+        post_type: postType,
+        image_url: imageUrls.length > 0 ? imageUrls[0] : undefined,
+      });
+
+      if (postResult.success) {
+        Alert.alert(
+          'Success',
+          'Post created successfully!',
+          [{ text: 'OK', onPress: () => router.back() }]
+        );
+      } else {
+        Alert.alert('Error', postResult.error || 'Failed to create post');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create post');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -72,8 +150,13 @@ export default function CreatePostScreen() {
           style={styles.headerButton}
           onPress={handleSubmit}
           activeOpacity={0.7}
+          disabled={uploading}
         >
-          <Text style={styles.postButton}>Post</Text>
+          {uploading ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <Text style={styles.postButton}>Post</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -184,9 +267,38 @@ export default function CreatePostScreen() {
         </View>
 
         {postType === 'image' && (
-          <View style={styles.placeholderSection}>
-            <Ionicons name="image-outline" size={48} color="#CCC" />
-            <Text style={styles.placeholderText}>Image upload coming soon</Text>
+          <View style={styles.section}>
+            <Text style={styles.label}>Images (Max 5)</Text>
+
+            <TouchableOpacity
+              style={styles.imagePickerButton}
+              onPress={pickImages}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="camera" size={24} color="#00311F" />
+              <Text style={styles.imagePickerText}>Select Images</Text>
+            </TouchableOpacity>
+
+            {selectedImages.length > 0 && (
+              <View style={styles.imagePreviewContainer}>
+                {selectedImages.map((uri, index) => (
+                  <View key={index} style={styles.imagePreview}>
+                    <Image
+                      source={{ uri }}
+                      style={styles.previewImage}
+                      contentFit="cover"
+                    />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => removeImage(index)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         )}
 
@@ -327,5 +439,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     marginTop: 12,
+  },
+  imagePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#D3E1C4',
+    borderRadius: 8,
+    gap: 8,
+  },
+  imagePickerText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#00311F',
+  },
+  imagePreviewContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16,
+    gap: 12,
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
   },
 });
