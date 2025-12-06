@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 export type TabType = 'popular' | 'explore' | 'following';
 
@@ -17,53 +17,60 @@ export function TabSelector({ activeTab, onTabChange }: TabSelectorProps) {
 
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        return (
-          <TouchableOpacity
-            key={tab.id}
-            style={styles.tab}
-            onPress={() => onTabChange(tab.id)}
-            activeOpacity={0.6}
-          >
-            <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-              {tab.label}
-            </Text>
-            {isActive && <View style={styles.activeIndicator} />}
-          </TouchableOpacity>
-        );
-      })}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={[styles.pill, isActive && styles.pillActive]}
+              onPress={() => onTabChange(tab.id)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.pillText, isActive && styles.pillTextActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF7E6',
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#E0E0E0',
+  },
+  scrollContent: {
     paddingHorizontal: 16,
+    gap: 8,
   },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 14,
+  pill: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
-  tabText: {
-    fontSize: 15,
+  pillActive: {
+    backgroundColor: '#00311F',
+    borderColor: '#00311F',
+  },
+  pillText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#999',
+    color: '#666',
   },
-  tabTextActive: {
-    color: '#000',
-  },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: '#000',
+  pillTextActive: {
+    color: '#FFF',
   },
 });

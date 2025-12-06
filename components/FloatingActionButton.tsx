@@ -23,11 +23,11 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 90,
+    bottom: 100,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#000',
+    backgroundColor: '#00311F',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

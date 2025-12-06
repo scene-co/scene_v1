@@ -63,8 +63,19 @@ export function RedditStyleForumCard({ post }: RedditStyleForumCardProps) {
         <View style={styles.contentContainer}>
           <View style={styles.mainContent}>
             {post.flair && (
-              <View style={[styles.flairBadge, { backgroundColor: post.flair.color + '20' }]}>
-                <Text style={[styles.flairText, { color: post.flair.color }]}>
+              <View style={[styles.flairBadge, { backgroundColor: post.flair.color }]}>
+                <Ionicons
+                  name={
+                    post.flair.text === 'RESOURCES' ? 'leaf' :
+                    post.flair.text === 'EVENT' ? 'calendar' :
+                    post.flair.text === 'QUESTION' ? 'help-circle' :
+                    'star'
+                  }
+                  size={10}
+                  color="#FFF"
+                  style={{ marginRight: 4 }}
+                />
+                <Text style={styles.flairText}>
                   {post.flair.text}
                 </Text>
               </View>
@@ -120,18 +131,23 @@ export function RedditStyleForumCard({ post }: RedditStyleForumCardProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#FFF7E6',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    paddingVertical: 10,
+    backgroundColor: '#F5EFE0',
+    borderRadius: 12,
+    marginHorizontal: 12,
+    marginVertical: 6,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   leftSection: {
-    paddingLeft: 8,
-    paddingRight: 4,
+    paddingRight: 8,
+    alignItems: 'center',
   },
   rightSection: {
     flex: 1,
-    paddingRight: 12,
   },
   header: {
     flexDirection: 'row',
@@ -170,16 +186,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flairBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginBottom: 6,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 8,
   },
   flairText: {
     fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    color: '#FFF',
   },
   title: {
     fontSize: 16,

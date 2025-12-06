@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF7E6',
   },
   listContent: {
+    paddingTop: 8,
     paddingBottom: 100,
   },
 });
