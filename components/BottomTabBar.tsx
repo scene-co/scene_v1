@@ -1,8 +1,169 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Image, Animated } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+
+interface TabButtonProps {
+  tab: {
+    name: string;
+    path: string;
+    icon: any;
+    ionicon: any;
+    useIonicon?: boolean;
+  };
+  isActive: boolean;
+  isEventsPage: boolean;
+  isHomePage: boolean;
+  isForumsPage: boolean;
+  isMarketplacePage: boolean;
+  isProfilePage: boolean;
+  isDarkPage: boolean;
+  onPress: () => void;
+}
+
+function TabButton({
+  tab,
+  isActive,
+  isEventsPage,
+  isHomePage,
+  isForumsPage,
+  isMarketplacePage,
+  isProfilePage,
+  isDarkPage,
+  onPress,
+}: TabButtonProps) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const iconScaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (isActive) {
+      Animated.spring(iconScaleAnim, {
+        toValue: 1.1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.spring(iconScaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isActive]);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.85,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <TouchableOpacity
+      style={styles.tab}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={1}
+    >
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleAnim }],
+          alignItems: 'center',
+        }}
+      >
+        <Animated.View
+          style={{
+            transform: [{ scale: iconScaleAnim }],
+          }}
+        >
+          {tab.useIonicon ? (
+            <View
+              style={[
+                isDarkPage && styles.iconWrapperBase,
+                isActive && isEventsPage && styles.iconWrapperActive,
+                isActive &&
+                  (isHomePage || isForumsPage) &&
+                  styles.iconWrapperActiveHome,
+                !isDarkPage && styles.iconMargin,
+              ]}
+            >
+              <Ionicons
+                name={tab.ionicon}
+                size={24}
+                color={
+                  isEventsPage
+                    ? isActive
+                      ? '#FFC107'
+                      : '#D4D4D8'
+                    : isHomePage || isForumsPage || isMarketplacePage || isProfilePage
+                    ? isActive
+                      ? '#00311F'
+                      : '#666'
+                    : isActive
+                    ? '#000'
+                    : '#999'
+                }
+              />
+            </View>
+          ) : (
+            <View
+              style={[
+                isDarkPage && styles.iconWrapperBase,
+                isActive && isEventsPage && styles.iconWrapperActive,
+                isActive &&
+                  (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) &&
+                  styles.iconWrapperActiveHome,
+              ]}
+            >
+              <Image
+                source={tab.icon}
+                style={[
+                  styles.icon,
+                  !isDarkPage && styles.iconMargin,
+                  isActive &&
+                    (isEventsPage
+                      ? styles.iconActiveEvents
+                      : isHomePage || isForumsPage || isMarketplacePage || isProfilePage
+                      ? styles.iconActiveHome
+                      : styles.iconActive),
+                  !isActive && isDarkPage && styles.iconInactiveDark,
+                ]}
+                resizeMode="contain"
+              />
+            </View>
+          )}
+        </Animated.View>
+        <Text
+          style={[
+            styles.label,
+            isActive &&
+              (isEventsPage
+                ? styles.labelActiveEvents
+                : isHomePage || isForumsPage || isMarketplacePage || isProfilePage
+                ? styles.labelActiveHome
+                : styles.labelActive),
+            !isActive && isDarkPage && styles.labelInactiveDark,
+          ]}
+        >
+          {tab.name}
+        </Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
 
 export function BottomTabBar() {
   const pathname = usePathname();
@@ -54,69 +215,32 @@ export function BottomTabBar() {
   const isDarkPage = isEventsPage || isHomePage || isForumsPage || isMarketplacePage || isProfilePage;
 
   return (
-    <View style={[
-      styles.container,
-      isEventsPage && styles.containerTranslucent,
-      isHomePage && styles.containerHome,
-      isForumsPage && styles.containerForums,
-      isMarketplacePage && styles.containerMarketplace,
-      isProfilePage && styles.containerProfile,
-      { paddingBottom: insets.bottom }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        isEventsPage && styles.containerTranslucent,
+        isHomePage && styles.containerHome,
+        isForumsPage && styles.containerForums,
+        isMarketplacePage && styles.containerMarketplace,
+        isProfilePage && styles.containerProfile,
+        { paddingBottom: insets.bottom },
+      ]}
+    >
       {tabs.map((tab) => {
         const isActive = pathname === tab.path;
         return (
-          <TouchableOpacity
+          <TabButton
             key={tab.path}
-            style={styles.tab}
+            tab={tab}
+            isActive={isActive}
+            isEventsPage={isEventsPage}
+            isHomePage={isHomePage}
+            isForumsPage={isForumsPage}
+            isMarketplacePage={isMarketplacePage}
+            isProfilePage={isProfilePage}
+            isDarkPage={isDarkPage}
             onPress={() => handleTabPress(tab.path)}
-            activeOpacity={0.7}
-          >
-            {tab.useIonicon ? (
-              <View style={[
-                isDarkPage && styles.iconWrapperBase,
-                isActive && isEventsPage && styles.iconWrapperActive,
-                isActive && (isHomePage || isForumsPage) && styles.iconWrapperActiveHome,
-                !isDarkPage && styles.iconMargin
-              ]}>
-                <Ionicons
-                  name={tab.ionicon}
-                  size={24}
-                  color={
-                    isEventsPage
-                      ? (isActive ? '#FFC107' : '#D4D4D8')
-                      : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage)
-                      ? (isActive ? '#00311F' : '#666')
-                      : (isActive ? '#000' : '#999')
-                  }
-                />
-              </View>
-            ) : (
-              <View style={[
-                isDarkPage && styles.iconWrapperBase,
-                isActive && isEventsPage && styles.iconWrapperActive,
-                isActive && (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) && styles.iconWrapperActiveHome
-              ]}>
-                <Image
-                  source={tab.icon}
-                  style={[
-                    styles.icon,
-                    !isDarkPage && styles.iconMargin,
-                    isActive && (isEventsPage ? styles.iconActiveEvents : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) ? styles.iconActiveHome : styles.iconActive),
-                    !isActive && isDarkPage && styles.iconInactiveDark,
-                  ]}
-                  resizeMode="contain"
-                />
-              </View>
-            )}
-            <Text style={[
-              styles.label,
-              isActive && (isEventsPage ? styles.labelActiveEvents : (isHomePage || isForumsPage || isMarketplacePage || isProfilePage) ? styles.labelActiveHome : styles.labelActive),
-              !isActive && isDarkPage && styles.labelInactiveDark,
-            ]}>
-              {tab.name}
-            </Text>
-          </TouchableOpacity>
+          />
         );
       })}
     </View>

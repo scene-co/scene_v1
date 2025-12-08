@@ -3,7 +3,7 @@
  * Discord-inspired profile with banner, avatar, tabs, and user content
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { TopBar } from '../components/TopBar';
@@ -19,6 +19,8 @@ import UserMarketplaceList from '../components/profile/UserMarketplaceList';
 import UserEventsList from '../components/profile/UserEventsList';
 import { ProfileTab } from '../types';
 import { shareProfile } from '../utils/shareUtils';
+import { getUserListings } from '../services/marketplaceService';
+import { getUserHostedEvents } from '../services/eventsService';
 
 export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
@@ -26,10 +28,11 @@ export default function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // Mock data - replace with actual data from backend
-  const mockPosts = [];
-  const mockListings = [];
-  const mockEvents = [];
+  // Real data from backend
+  const [posts, setPosts] = useState<any[]>([]);
+  const [listings, setListings] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleMenuPress = () => {
     setSidebarVisible(true);
@@ -67,10 +70,50 @@ export default function ProfileScreen() {
     });
   };
 
+  // Fetch user's marketplace listings
+  const fetchListings = async () => {
+    try {
+      const userListings = await getUserListings();
+      setListings(userListings);
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    }
+  };
+
+  // Fetch user's hosted events
+  const fetchEvents = async () => {
+    try {
+      const userEvents = await getUserHostedEvents();
+      setEvents(userEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  // Fetch forum posts - TODO: implement when forum posts service is ready
+  const fetchPosts = async () => {
+    try {
+      // TODO: Implement getUserPosts from forumService
+      setPosts([]);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    if (profile?.id) {
+      setLoading(true);
+      Promise.all([fetchListings(), fetchEvents(), fetchPosts()]).finally(() => {
+        setLoading(false);
+      });
+    }
+  }, [profile?.id]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshProfile();
-    // TODO: Refresh user content based on active tab
+    await Promise.all([fetchListings(), fetchEvents(), fetchPosts()]);
     setRefreshing(false);
   };
 
@@ -80,8 +123,8 @@ export default function ProfileScreen() {
         return (
           <UserPostsList
             userId={profile?.id || ''}
-            posts={mockPosts}
-            loading={false}
+            posts={posts}
+            loading={loading}
             onRefresh={handleRefresh}
             refreshing={refreshing}
           />
@@ -90,8 +133,8 @@ export default function ProfileScreen() {
         return (
           <UserMarketplaceList
             userId={profile?.id || ''}
-            items={mockListings}
-            loading={false}
+            items={listings}
+            loading={loading}
             onRefresh={handleRefresh}
             refreshing={refreshing}
           />
@@ -100,8 +143,8 @@ export default function ProfileScreen() {
         return (
           <UserEventsList
             userId={profile?.id || ''}
-            events={mockEvents}
-            loading={false}
+            events={events}
+            loading={loading}
             onRefresh={handleRefresh}
             refreshing={refreshing}
           />
@@ -173,9 +216,9 @@ export default function ProfileScreen() {
         <ProfileTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          postCount={mockPosts.length}
-          listingCount={mockListings.length}
-          eventCount={mockEvents.length}
+          postCount={posts.length}
+          listingCount={listings.length}
+          eventCount={events.length}
         />
 
         {/* Tab Content */}

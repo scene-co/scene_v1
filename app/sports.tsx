@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TopBar } from '../components/TopBar';
 import { BottomTabBar } from '../components/BottomTabBar';
+import { Sidebar } from '../components/Sidebar';
 
 export default function SportsScreen() {
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+
   return (
     <View style={styles.container}>
-      <TopBar />
+      <TopBar onMenuPress={() => setSidebarVisible(true)} />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.centered}>
@@ -49,6 +52,8 @@ export default function SportsScreen() {
       </ScrollView>
 
       <BottomTabBar />
+
+      <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
     </View>
   );
 }
