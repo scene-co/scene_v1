@@ -1,32 +1,91 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { TopBar } from '../components/TopBar';
 import { BottomTabBar } from '../components/BottomTabBar';
-import { MarketplaceCard } from '../components/cards/MarketplaceCard';
-import { mockMarketplaceItems } from '../data/mockMarketplace';
+import { Sidebar } from '../components/Sidebar';
+import { MarketplaceCard, MarketplaceItem } from '../components/cards/MarketplaceCard';
+import { getListings } from '../services/marketplaceService';
+import { MarketplaceListing } from '../types/database.types';
 
-type CategoryType = 'all' | 'textbooks' | 'furniture' | 'electronics' | 'accessories';
+type CategoryType = 'all' | 'Textbooks' | 'Furniture' | 'Electronics' | 'Accessories';
 
 const categories = [
   { id: 'all' as CategoryType, label: 'All Items', icon: 'grid-outline' as const },
-  { id: 'textbooks' as CategoryType, label: 'Textbooks', icon: 'book-outline' as const },
-  { id: 'furniture' as CategoryType, label: 'Furniture', icon: 'bed-outline' as const },
-  { id: 'electronics' as CategoryType, label: 'Electronics', icon: 'laptop-outline' as const },
-  { id: 'accessories' as CategoryType, label: 'Accessories', icon: 'watch-outline' as const },
+  { id: 'Textbooks' as CategoryType, label: 'Textbooks', icon: 'book-outline' as const },
+  { id: 'Furniture' as CategoryType, label: 'Furniture', icon: 'bed-outline' as const },
+  { id: 'Electronics' as CategoryType, label: 'Electronics', icon: 'laptop-outline' as const },
+  { id: 'Accessories' as CategoryType, label: 'Accessories', icon: 'watch-outline' as const },
 ];
+
+// Convert database listing to card item format
+const convertToCardItem = (listing: MarketplaceListing): MarketplaceItem => {
+  return {
+    id: listing.id,
+    title: listing.title,
+    price: listing.price,
+    condition: listing.condition,
+    seller: 'Anonymous', // TODO: Join with profiles table to get username
+    images: listing.images,
+    description: listing.description,
+  };
+};
 
 export default function MarketplaceScreen() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('all');
+  const [listings, setListings] = useState<MarketplaceListing[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const handleMenuPress = () => {
-    Alert.alert('Menu', 'Sidebar menu coming soon!');
+    setSidebarVisible(true);
   };
 
   const handleFiltersPress = () => {
     Alert.alert('Filters', 'Filter options coming soon!');
   };
+
+  // Fetch listings from Supabase
+  const fetchListings = async () => {
+    setLoading(true);
+    try {
+      const category = selectedCategory === 'all' ? undefined : selectedCategory;
+      const { listings: fetchedListings } = await getListings(category, 'active', 50, 0);
+      setListings(fetchedListings);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load listings');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, [selectedCategory]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchListings();
+  };
+
+  // Filter listings based on search query
+  const filteredListings = listings.filter((listing) => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    return (
+      listing.title.toLowerCase().includes(query) ||
+      listing.description.toLowerCase().includes(query) ||
+      listing.category.toLowerCase().includes(query)
+    );
+  });
+
+  // Convert listings to card items
+  const cardItems = filteredListings.map(convertToCardItem);
 
   return (
     <View style={styles.container}>
@@ -36,11 +95,26 @@ export default function MarketplaceScreen() {
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       >
         {/* Search Bar */}
         <View style={styles.searchBar}>
           <Ionicons name="search" size={20} color="#666" />
-          <Text style={styles.searchPlaceholder}>Search for items</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search for items"
+            placeholderTextColor="#666"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.7}>
+              <Ionicons name="close-circle" size={20} color="#666" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Category Filters */}
@@ -87,13 +161,15 @@ export default function MarketplaceScreen() {
 
         {/* Section Header */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>ALL ITEMS</Text>
-          <Text style={styles.itemCount}>{mockMarketplaceItems.length} items</Text>
+          <Text style={styles.sectionTitle}>
+            {selectedCategory === 'all' ? 'ALL ITEMS' : selectedCategory.toUpperCase()}
+          </Text>
+          <Text style={styles.itemCount}>{cardItems.length} items</Text>
         </View>
 
         {/* Items Grid */}
         <View style={styles.grid}>
-          {mockMarketplaceItems.map((item) => (
+          {cardItems.map((item) => (
             <View key={item.id} style={styles.gridItem}>
               <MarketplaceCard item={item} />
             </View>
@@ -111,6 +187,8 @@ export default function MarketplaceScreen() {
       </TouchableOpacity>
 
       <BottomTabBar />
+
+      <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
     </View>
   );
 }
@@ -137,9 +215,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     gap: 12,
   },
-  searchPlaceholder: {
+  searchInput: {
+    flex: 1,
     fontSize: 16,
-    color: '#666',
+    color: '#333',
+    padding: 0,
   },
   categoriesContainer: {
     marginTop: 16,

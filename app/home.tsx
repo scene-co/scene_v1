@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { TopBar } from '../components/TopBar';
 import { SearchBar } from '../components/SearchBar';
 import { BottomTabBar } from '../components/BottomTabBar';
+import { Sidebar } from '../components/Sidebar';
 import { SectionHeader } from '../components/SectionHeader';
 import { HorizontalCarousel } from '../components/HorizontalCarousel';
 import { EventCard } from '../components/cards/EventCard';
@@ -16,6 +17,7 @@ import { useEffect, useState } from 'react';
 export default function Home() {
   const { profile } = useAuth();
   const [greeting, setGreeting] = useState('');
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -31,7 +33,7 @@ export default function Home() {
   }, []);
 
   const handleMenuPress = () => {
-    Alert.alert('Menu', 'Sidebar menu coming soon!');
+    setSidebarVisible(true);
   };
 
   return (
@@ -77,6 +79,8 @@ export default function Home() {
       </ScrollView>
 
       <BottomTabBar />
+
+      <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
     </View>
   );
 }

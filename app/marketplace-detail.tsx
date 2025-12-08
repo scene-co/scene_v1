@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { mockMarketplaceItems } from '../data/mockMarketplace';
+import { getListingById } from '../services/marketplaceService';
+import { MarketplaceListing } from '../types/database.types';
+import { ImageCarousel } from '../components/ImageCarousel';
 
 export const unstable_settings = {
   animation: 'slide_from_bottom',
@@ -12,12 +14,48 @@ export const unstable_settings = {
 export default function MarketplaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const item = mockMarketplaceItems.find((i) => i.id === id);
+  const [listing, setListing] = useState<MarketplaceListing | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!item) {
+  useEffect(() => {
+    const fetchListing = async () => {
+      if (!id) return;
+
+      setLoading(true);
+      try {
+        const result = await getListingById(id as string);
+        if (result.success && result.listing) {
+          setListing(result.listing);
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListing();
+  }, [id]);
+
+  if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Item not found</Text>
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#00311F" />
+      </View>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Ionicons name="alert-circle-outline" size={64} color="#999" />
+        <Text style={styles.errorText}>Listing not found</Text>
+        <TouchableOpacity
+          style={styles.backToMarketButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backToMarketText}>Back to Marketplace</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -37,26 +75,30 @@ export default function MarketplaceDetailScreen() {
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.imagePlaceholder}>
-          <Ionicons name="image-outline" size={64} color="#666" />
-        </View>
+        {listing.images && listing.images.length > 0 ? (
+          <ImageCarousel images={listing.images} />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Ionicons name="image-outline" size={64} color="#666" />
+          </View>
+        )}
 
         <View style={styles.details}>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title}>{listing.title}</Text>
             <View style={styles.conditionBadge}>
-              <Text style={styles.conditionText}>{item.condition}</Text>
+              <Text style={styles.conditionText}>{listing.condition}</Text>
             </View>
           </View>
 
-          <Text style={styles.price}>₹{item.price.toLocaleString()}</Text>
+          <Text style={styles.price}>₹{listing.price.toLocaleString()}</Text>
 
           <View style={styles.sellerSection}>
             <Text style={styles.sectionTitle}>Seller Information</Text>
             <View style={styles.sellerRow}>
               <Ionicons name="person-circle" size={40} color="#666" />
               <View style={styles.sellerInfo}>
-                <Text style={styles.sellerName}>{item.seller}</Text>
+                <Text style={styles.sellerName}>Anonymous</Text>
                 <Text style={styles.sellerSubtext}>Member since 2024</Text>
               </View>
             </View>
@@ -64,7 +106,7 @@ export default function MarketplaceDetailScreen() {
 
           <View style={styles.descriptionSection}>
             <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{item.description}</Text>
+            <Text style={styles.description}>{listing.description}</Text>
           </View>
 
           <TouchableOpacity style={styles.contactButton}>
@@ -81,6 +123,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFF',
+  },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    marginBottom: 24,
+  },
+  backToMarketButton: {
+    backgroundColor: '#00311F',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backToMarketText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',

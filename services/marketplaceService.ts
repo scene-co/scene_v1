@@ -104,7 +104,7 @@ export const getListings = async (
 /**
  * Get a single listing by ID
  */
-export const getListingById = async (listingId: string): Promise<MarketplaceListing | null> => {
+export const getListingById = async (listingId: string): Promise<{ success: boolean; listing?: MarketplaceListing; error?: string }> => {
   try {
     const { data, error } = await supabase
       .from('marketplace_listings')
@@ -114,13 +114,13 @@ export const getListingById = async (listingId: string): Promise<MarketplaceList
 
     if (error) {
       console.error('Error fetching listing:', error);
-      return null;
+      return { success: false, error: error.message };
     }
 
-    return data;
-  } catch (error) {
+    return { success: true, listing: data };
+  } catch (error: any) {
     console.error('Error in getListingById:', error);
-    return null;
+    return { success: false, error: error.message || 'Failed to fetch listing' };
   }
 };
 

@@ -9,7 +9,7 @@ export interface MarketplaceItem {
   price: number;
   condition: 'New' | 'Like New' | 'Good' | 'Fair';
   seller: string;
-  image?: string;
+  images?: string[];
   description: string;
 }
 
@@ -22,14 +22,25 @@ export function MarketplaceCard({ item }: MarketplaceCardProps) {
     router.push(`/marketplace-detail?id=${item.id}` as any);
   };
 
+  const firstImage = item.images && item.images.length > 0 ? item.images[0] : null;
+  const imageCount = item.images?.length || 0;
+
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={handlePress}
       activeOpacity={0.7}
     >
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.image} />
+      {firstImage ? (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: firstImage }} style={styles.image} />
+          {imageCount > 1 && (
+            <View style={styles.imageCountBadge}>
+              <Ionicons name="images" size={12} color="#FFF" />
+              <Text style={styles.imageCountText}>{imageCount}</Text>
+            </View>
+          )}
+        </View>
       ) : (
         <View style={styles.imagePlaceholder}>
           <Ionicons name="image-outline" size={32} color="#666" />
@@ -71,10 +82,32 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  imageContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 140,
+  },
   image: {
     width: '100%',
     height: 140,
     backgroundColor: '#F5F5F5',
+  },
+  imageCountBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  imageCountText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   imagePlaceholder: {
     width: '100%',

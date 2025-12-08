@@ -8,6 +8,7 @@ import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { TopBar } from '../components/TopBar';
 import { BottomTabBar } from '../components/BottomTabBar';
+import { Sidebar } from '../components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import ProfileInfo from '../components/profile/ProfileInfo';
@@ -23,6 +24,7 @@ export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>('posts');
   const [refreshing, setRefreshing] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   // Mock data - replace with actual data from backend
   const mockPosts = [];
@@ -30,7 +32,7 @@ export default function ProfileScreen() {
   const mockEvents = [];
 
   const handleMenuPress = () => {
-    console.log('Menu pressed');
+    setSidebarVisible(true);
   };
 
   const handleSettings = () => {
@@ -181,6 +183,8 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <BottomTabBar />
+
+      <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
     </View>
   );
 }

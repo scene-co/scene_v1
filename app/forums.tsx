@@ -2,8 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Alert, RefreshControl } from 'react-native';
 import { TopBar } from '../components/TopBar';
 import { BottomTabBar } from '../components/BottomTabBar';
+import { Sidebar } from '../components/Sidebar';
 import { TabSelector, TabType } from '../components/TabSelector';
-import { SortFilter, SortType } from '../components/SortFilter';
+import { SortFilter, SortType} from '../components/SortFilter';
 import { RedditStyleForumCard } from '../components/cards/RedditStyleForumCard';
 import { FloatingActionButton } from '../components/FloatingActionButton';
 import { getPosts } from '../services/forumService';
@@ -62,9 +63,10 @@ export default function ForumsScreen() {
   const [posts, setPosts] = useState<DBForumPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const handleMenuPress = () => {
-    Alert.alert('Menu', 'Sidebar menu coming soon!');
+    setSidebarVisible(true);
   };
 
   // Fetch posts from Supabase
@@ -170,6 +172,8 @@ export default function ForumsScreen() {
       <FloatingActionButton />
 
       <BottomTabBar />
+
+      <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
     </View>
   );
 }
